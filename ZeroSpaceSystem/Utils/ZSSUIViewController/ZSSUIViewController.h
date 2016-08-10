@@ -23,6 +23,13 @@
 - (void)hideNavigationView:(BOOL)hide;
 
 /**
+ *  设置导航条Frame
+ *
+ *  @param frame 导航条Frame
+ */
+- (void)setNavigationViewFrame:(CGRect)frame;
+
+/**
  *  设置导航条标题
  *
  *  @param title 导航条标题
@@ -41,7 +48,7 @@
  *
  *  @param button 右按钮
  */
-- (void)setNavitationViewRightButton:(UIButton *)button;
+- (void)setNavigationViewRightButton:(UIButton *)button;
 
 /**
  *  自定义导航条

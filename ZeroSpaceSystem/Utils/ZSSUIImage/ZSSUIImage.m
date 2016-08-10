@@ -10,4 +10,11 @@
 
 @implementation ZSSUIImage
 
++ (ZSSUIImage *)imageNamed:(NSString *)imageName {
+    
+    ZSSUIImage *image = (ZSSUIImage *)[UIImage imageNamed:imageName];
+    
+    return image;
+}
+
 @end

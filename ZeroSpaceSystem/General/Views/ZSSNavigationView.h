@@ -17,11 +17,6 @@
 @interface ZSSNavigationView : ZSSUIView
 
 /**
- *  父viewController
- */
-@property (weak, nonatomic) ZSSUIViewController *parentViewController;
-
-/**
  *  设置左按钮
  *
  *  @param button 左按钮

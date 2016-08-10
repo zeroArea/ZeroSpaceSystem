@@ -37,22 +37,22 @@ WKUIDelegate
 
 @implementation ZSSWebView
 
-- (instancetype)initWithFrame:(CGRect)frame
-{
+- (instancetype)initWithFrame:(CGRect)frame {
+    
     self = [super initWithFrame:frame];
-    if (self)
-    {
-        if([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
-        {
-            _webView = [[ZSSWKWebView alloc] init];
-        }
-        else
-        {
-            _webView = [[ZSSUIWebView alloc] init];
-        }
+    if (self) {
         
-        if([_webView isKindOfClass:[WKWebView class]])
-        {
+        //        if([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0) {
+        //            
+        //            _webView = [[ZSSWKWebView alloc] init];
+        //        }
+        //        else {
+        //            
+        _webView = [[ZSSUIWebView alloc] init];
+        //        }
+        
+        if([_webView isKindOfClass:[WKWebView class]]) {
+            
             ZSSWKWebView *webView = _webView;
             
             [webView setFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
@@ -67,8 +67,8 @@ WKUIDelegate
             
             [self addSubview:webView];
         }
-        else
-        {
+        else {
+            
             ZSSUIWebView *webView = _webView;
             
             [webView setFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
@@ -94,41 +94,93 @@ WKUIDelegate
  }
  */
 
-- (void)evaluateJavaScript:(NSString *)javaScriptString completionHandler:(void (^ __nullable)(__nullable id, NSError * __nullable error))completionHandler
-{
-    if ([_webView isKindOfClass:[WKWebView class]])
-    {
+- (BOOL)isLoading {
+    
+    if([_webView isKindOfClass:[WKWebView class]]) {
+        
+        ZSSWKWebView *webView = _webView;
+        
+        return [webView isLoading];
+    }
+    else {
+        
+        ZSSUIWebView *webView = _webView;
+        
+        return [webView isLoading];
+    }
+}
+
+- (void)reload {
+    
+    if([_webView isKindOfClass:[WKWebView class]]) {
+        
+        ZSSWKWebView *webView = _webView;
+        
+        [webView reload];
+    }
+    else {
+        
+        ZSSUIWebView *webView = _webView;
+        
+        [webView reload];
+    }
+}
+
+- (void)stopLoading {
+    
+    if([_webView isKindOfClass:[WKWebView class]]) {
+        
+        ZSSWKWebView *webView = _webView;
+        
+        [webView stopLoading];
+    }
+    else {
+        
+        ZSSUIWebView *webView = _webView;
+        
+        [webView stopLoading];
+    }
+}
+
+- (void)evaluateJavaScript:(NSString *)javaScriptString
+         completionHandler:(void (^ __nullable)(__nullable id, NSError * __nullable error))completionHandler {
+    
+    if ([_webView isKindOfClass:[WKWebView class]]) {
+        
         ZSSWKWebView *webview = _webView;
         
         [webview evaluateJavaScript:javaScriptString completionHandler:completionHandler];
     }
-    else
-    {
+    else {
+        
         ZSSUIWebView *webview = _webView;
         
         NSString *value = [webview stringByEvaluatingJavaScriptFromString:javaScriptString];
         
-        if (completionHandler)
-        {
+        if (completionHandler) {
+            
             completionHandler(value, nil);
         }
     }
 }
 
-- (void)registerWebViewJavascriptBridgeWithHandler:(NSString *)handlerName handler:(void (^)(id, void (^)(id)))handler
-{
+- (void)registerWebViewJavascriptBridgeWithHandler:(NSString *)handlerName
+                                           handler:(void (^)(id, void (^)(id)))handler {
+    
     DDLogInfo(@"%@:%@", THIS_FILE, THIS_METHOD);
     
     [_javascriptBridge registerHandler:@"testObjcCallback" handler:^(id data, WVJBResponseCallback responseCallback) {
-        if (handler)
-        {
+        
+        if (handler) {
+            
             handler(data, responseCallback);
         }
     }];
 }
 
-- (void)callWebViewJavascriptBridgeWithHandler:(NSString *)handlerName data:(id)data
-{
+- (void)callWebViewJavascriptBridgeWithHandler:(NSString *)handlerName
+                                          data:(id)data {
+    
     DDLogInfo(@"%@:%@", THIS_FILE, THIS_METHOD);
     
     [_javascriptBridge callHandler:handlerName data:data];
@@ -136,43 +188,43 @@ WKUIDelegate
 
 #pragma mark - Public Interface
 
-- (void)loadRequest:(NSURLRequest *)request
-{
-    if([_webView isKindOfClass:[WKWebView class]])
-    {
+- (void)loadRequest:(NSURLRequest *)request {
+    
+    if([_webView isKindOfClass:[WKWebView class]]) {
+        
         WKWebView *webView = _webView;
         
         [webView loadRequest:request];
     }
-    else
-    {
+    else {
+        
         UIWebView *webView = _webView;
         
         [webView loadRequest:request];
     }
 }
 
-- (void)loadURL:(NSURL *)URL
-{
+- (void)loadURL:(NSURL *)URL {
+    
     [self loadRequest:[NSURLRequest requestWithURL:URL]];
 }
 
-- (void)loadURLString:(NSString *)URLString
-{
+- (void)loadURLString:(NSString *)URLString {
+    
     NSURL *URL = [NSURL URLWithString:URLString];
     [self loadURL:URL];
 }
 
-- (void)loadHTMLString:(NSString *)HTMLString
-{
-    if([_webView isKindOfClass:[WKWebView class]])
-    {
+- (void)loadHTMLString:(NSString *)HTMLString {
+    
+    if([_webView isKindOfClass:[WKWebView class]]) {
+        
         WKWebView *webView = _webView;
         
         [webView loadHTMLString:HTMLString baseURL:nil];
     }
-    else
-    {
+    else {
+        
         UIWebView *webView = _webView;
         
         [webView loadHTMLString:HTMLString baseURL:nil];
@@ -181,8 +233,8 @@ WKUIDelegate
 
 #pragma mark - External App Support
 
-- (BOOL)externalAppRequiredToOpenURL:(NSURL *)URL
-{
+- (BOOL)externalAppRequiredToOpenURL:(NSURL *)URL {
+    
     //若需要限制只允许某些前缀的scheme通过请求，则取消下述注释，并在数组内添加自己需要放行的前缀
     NSSet *validSchemes = [NSSet setWithArray:@[@"http", @"https", @"file", @"ftp"]];
     return ![validSchemes containsObject:URL.scheme];
@@ -190,8 +242,8 @@ WKUIDelegate
 
 #pragma mark --- ZSSUIWebViewProgressDelegate
 
-- (void)webView:(ZSSUIWebView*)webView didReceiveResourceNumber:(int)resourceNumber totalResources:(int)totalResources
-{
+- (void)webView:(ZSSUIWebView*)webView didReceiveResourceNumber:(int)resourceNumber totalResources:(int)totalResources {
+    
     //Set progress value
     CGFloat estimatedProgress = ((float)resourceNumber) / ((float)totalResources);
     
@@ -200,15 +252,15 @@ WKUIDelegate
 
 #pragma mark - UIWebViewDelegate
 
-- (void)webViewDidStartLoad:(UIWebView *)webView
-{
+- (void)webViewDidStartLoad:(UIWebView *)webView {
+    
     [self.delegate zsswebViewDidStartLoad:self];
 }
 
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
-{
-    if(![self externalAppRequiredToOpenURL:request.URL])
-    {
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    
+    if(![self externalAppRequiredToOpenURL:request.URL]) {
+        
         //back delegate
         [self.delegate zsswebView:self shouldStartLoadWithURL:request.URL];
         
@@ -219,22 +271,22 @@ WKUIDelegate
 }
 
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView
-{
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
+    
     //back delegate
     [self.delegate zsswebView:self didFinishLoadingURL:webView.request.URL];
 }
 
-- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
-{
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
+    
     //back delegate
     [self.delegate zsswebView:self didFailToLoadURL:webView.request.URL error:error];
 }
 
 #pragma mark - WKNavigationDelegate
 
-- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation
-{
+- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
+    
     //back delegate
     [self.delegate zsswebViewDidStartLoad:self];
     
@@ -243,39 +295,39 @@ WKUIDelegate
      */
 }
 
-- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation
-{
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    
     //back delegate
     [self.delegate zsswebView:self didFinishLoadingURL:webView.URL];
 }
 
-- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error
-{
+- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    
     //back delegate
     [self.delegate zsswebView:self didFailToLoadURL:webView.URL error:error];
 }
 
-- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error
-{
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    
     //back delegate
     [self.delegate zsswebView:self didFailToLoadURL:webView.URL error:error];
 }
 
-- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
-{
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+    
     NSURL *URL = navigationAction.request.URL;
-    if(![self externalAppRequiredToOpenURL:URL])
-    {
-        if(!navigationAction.targetFrame)
-        {
+    if(![self externalAppRequiredToOpenURL:URL]) {
+        
+        if(!navigationAction.targetFrame) {
+            
             [self loadURL:URL];
             decisionHandler(WKNavigationActionPolicyCancel);
             return;
         }
         [self callback_webViewShouldStartLoadWithRequest:navigationAction.request navigationType:navigationAction.navigationType];
     }
-    else if([[UIApplication sharedApplication] canOpenURL:URL])
-    {
+    else if([[UIApplication sharedApplication] canOpenURL:URL]) {
+        
         decisionHandler(WKNavigationActionPolicyCancel);
         return;
     }
@@ -283,8 +335,8 @@ WKUIDelegate
     decisionHandler(WKNavigationActionPolicyAllow);
 }
 
-- (BOOL)callback_webViewShouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(NSInteger)navigationType
-{
+- (BOOL)callback_webViewShouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(NSInteger)navigationType {
+    
     //back delegate
     [self.delegate zsswebView:self shouldStartLoadWithURL:request.URL];
     return YES;
@@ -292,10 +344,10 @@ WKUIDelegate
 
 #pragma mark - WKUIDelegate
 
-- (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
-{
-    if (!navigationAction.targetFrame.isMainFrame)
-    {
+- (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures {
+    
+    if (!navigationAction.targetFrame.isMainFrame) {
+        
         [webView loadRequest:navigationAction.request];
     }
     return nil;
@@ -303,33 +355,33 @@ WKUIDelegate
 
 #pragma mark - Estimated Progress KVO (WKWebView)
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    
     WKWebView *webView = _webView;
     
-    if ([keyPath isEqualToString:NSStringFromSelector(@selector(estimatedProgress))] && object == _webView)
-    {
+    if ([keyPath isEqualToString:NSStringFromSelector(@selector(estimatedProgress))] && object == _webView) {
+        
         [self.delegate zsswebView:self progress:webView.estimatedProgress];
     }
-    else
-    {
+    else {
+        
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
 
 #pragma mark - Dealloc
 
-- (void)dealloc
-{
-    if ([_webView isKindOfClass:[WKWebView class]])
-    {
+- (void)dealloc {
+    
+    if ([_webView isKindOfClass:[WKWebView class]]) {
+        
         [_webView setNavigationDelegate:nil];
         [_webView setUIDelegate:nil];
         
         [_webView removeObserver:self forKeyPath:NSStringFromSelector(@selector(estimatedProgress))];
     }
-    else
-    {
+    else {
+        
         [_webView setDelegate:nil];
         [_webView setProgressDelegate:nil];
     }

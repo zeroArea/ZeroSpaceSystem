@@ -11,6 +11,7 @@
 #import <CocoaLumberjack/DDLog.h>
 #import <CocoaLumberjack/DDTTYLogger.h>
 
+
 @interface ZSSNavigationView ()
 
 @property (nonatomic, strong) ZSSUILabel  *labelTitle;
@@ -26,6 +27,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         
+        self.backgroundColor = NAVIGATIONBAR_COLOR;
     }
     return self;
 }

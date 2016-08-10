@@ -10,4 +10,6 @@
 
 @interface ZSSUIImage : UIImage
 
++ (ZSSUIImage *)imageNamed:(NSString *)imageName;
+
 @end

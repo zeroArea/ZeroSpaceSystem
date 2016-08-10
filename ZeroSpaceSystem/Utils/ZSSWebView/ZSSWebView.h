@@ -34,6 +34,10 @@
 - (void)loadURLString:(NSString *)URLString;
 - (void)loadHTMLString:(NSString *)HTMLString;
 
+- (void)reload;
+- (void)stopLoading;
+- (BOOL)isLoading;
+
 - (void)evaluateJavaScript:(NSString *)javaScriptString completionHandler:(void (^ __nullable)(__nullable id, NSError * __nullable error))completionHandler;
 
 - (void)registerWebViewJavascriptBridgeWithHandler:(NSString *)handlerName handler:(void (^)(id, void (^)(id)))handler;

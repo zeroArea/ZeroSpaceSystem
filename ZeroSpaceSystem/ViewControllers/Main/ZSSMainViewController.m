@@ -31,7 +31,7 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    
+    DDLogInfo(@"load main");
 }
 
 - (void)didReceiveMemoryWarning

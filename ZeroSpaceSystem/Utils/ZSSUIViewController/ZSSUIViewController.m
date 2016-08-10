@@ -17,6 +17,11 @@
 
 @implementation ZSSUIViewController
 
+- (void)backOnClicked:(id)sender {
+    
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     
     [super viewWillAppear:animated];
@@ -40,13 +45,22 @@
         SCREEN_WIDTH,
         NAVIGATIONBAR_HEIGHT + STATUSBAR_HEIGHT
     }];
-    _navigationView.parentViewController = self;
     [self.view addSubview:_navigationView];
+    
+    if ([self.navigationController.viewControllers count] > 1) {
+        
+        UIImage *backbuttonimage = [UIImage imageNamed:@"ZSSNaviBackButton"];
+        ZSSUIButton *backButton = [[ZSSUIButton alloc] init];
+        [backButton setImage:backbuttonimage forState:UIControlStateNormal];
+        [backButton sizeToFit];
+        [backButton addTarget:self action:@selector(backOnClicked:) forControlEvents:UIControlEventTouchUpInside];
+        [self setNavigationViewLeftButton:backButton];
+    }
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
     
-    return UIStatusBarStyleLightContent;
+    return UIStatusBarStyleDefault;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -87,6 +101,14 @@
     }
 }
 
+- (void)setNavigationViewFrame:(CGRect)frame {
+    
+    if (_navigationView) {
+        
+        _navigationView.frame = frame;
+    }
+}
+
 - (void)setNavigationViewTitle:(NSString *)title {
     
     if (_navigationView) {
@@ -103,7 +125,7 @@
     }
 }
 
-- (void)setNavitationViewRightButton:(UIButton *)button {
+- (void)setNavigationViewRightButton:(UIButton *)button {
     
     if (_navigationView) {
         
