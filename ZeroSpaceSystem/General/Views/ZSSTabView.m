@@ -47,7 +47,6 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
             button.frame.size.width,
             button.frame.size.height
         };
-        NSLog(@"%lf, %lf", button.frame.size.width, button.frame.size.height);
         [self addSubview:button];
     }
 }

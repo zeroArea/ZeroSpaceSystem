@@ -32,6 +32,11 @@ static const int ddLogLevel = LOG_LEVEL_VERBOSE;
     // Do any additional setup after loading the view.
     
     DDLogInfo(@"load main");
+    
+    UIImage *backbuttonimage = [UIImage imageNamed:@"ZSSNaviBackButton"];
+    ZSSUIButton *backButton = [[ZSSUIButton alloc] init];
+    [backButton setImage:backbuttonimage forState:UIControlStateNormal];
+    [self setNavigationViewLeftButton:backButton];
 }
 
 - (void)didReceiveMemoryWarning

@@ -189,45 +189,25 @@ UITextFieldDelegate
         TABBAR_HEIGHT
     }];
     ZSSUIButton *backButton     = [[ZSSUIButton alloc] init];
-    UIImage *image3 = [UIImage imageNamed:@"0104-undo2"];
-    backButton.frame = (CGRect){
-        0.f,
-        0.f,
-        TABBAR_HEIGHT - 20,
-        TABBAR_HEIGHT - 20
-    };
+    UIImage *image3 = [UIImage imageNamed:@"ZSSGoBackButton"];
     [backButton setImage:image3 forState:UIControlStateNormal];
+    [backButton sizeToFit];
     ZSSUIButton *forwarkButton  = [[ZSSUIButton alloc] init];
-    UIImage *image4 = [UIImage imageNamed:@"0105-redo2"];
-    forwarkButton.frame = (CGRect){
-        0.f,
-        0.f,
-        TABBAR_HEIGHT - 20,
-        TABBAR_HEIGHT - 20
-    };
+    UIImage *image4 = [UIImage imageNamed:@"ZSSGoForwardButton"];
     [forwarkButton setImage:image4 forState:UIControlStateNormal];
+    [forwarkButton sizeToFit];
     ZSSUIButton *menuButton     = [[ZSSUIButton alloc] init];
-    UIImage *image5 = [UIImage imageNamed:@"0190-menu"];
-    menuButton.frame = (CGRect){
-        0.f,
-        0.f,
-        TABBAR_HEIGHT - 20,
-        TABBAR_HEIGHT - 20
-    };
+    UIImage *image5 = [UIImage imageNamed:@"ZSSTabMenuButton"];
     [menuButton setImage:image5 forState:UIControlStateNormal];
+    [menuButton sizeToFit];
     ZSSUIButton *multiButton    = [[ZSSUIButton alloc] init];
     UIImage *image6 = [UIImage imageNamed:@"ZSSTabOverviewButton"];
     [multiButton setImage:image6 forState:UIControlStateNormal];
     [multiButton sizeToFit];
     ZSSUIButton *homeButton     = [[ZSSUIButton alloc] init];
-    UIImage *image7 = [UIImage imageNamed:@"0001-home"];
-    homeButton.frame = (CGRect){
-        0.f,
-        0.f,
-        TABBAR_HEIGHT - 20,
-        TABBAR_HEIGHT - 20
-    };
+    UIImage *image7 = [UIImage imageNamed:@"ZSSTabHomeButton"];
     [homeButton setImage:image7 forState:UIControlStateNormal];
+    [homeButton sizeToFit];
     
     [_tabView setButtonItems:@[backButton, forwarkButton, menuButton, multiButton, homeButton]];
     [self.view addSubview:_tabView];
