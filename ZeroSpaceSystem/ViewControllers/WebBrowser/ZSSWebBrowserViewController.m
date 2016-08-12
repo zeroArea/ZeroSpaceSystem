@@ -189,24 +189,41 @@ UITextFieldDelegate
         TABBAR_HEIGHT
     }];
     ZSSUIButton *backButton     = [[ZSSUIButton alloc] init];
-    UIImage *image3 = [UIImage imageNamed:@"ZSSGoBackButton"];
+    UIImage *image3 = [UIImage imageNamed:@"ZSSTabGoBackButton_N"];
     [backButton setImage:image3 forState:UIControlStateNormal];
+    UIImage *image8 = [UIImage imageNamed:@"ZSSTabGoBackButton_H"];
+    [backButton setImage:image8 forState:UIControlStateHighlighted];
+    [backButton setImage:image8 forState:UIControlStateDisabled];
     [backButton sizeToFit];
+    [backButton addTarget:self action:@selector(goBack) forControlEvents:UIControlEventTouchUpInside];
     ZSSUIButton *forwarkButton  = [[ZSSUIButton alloc] init];
-    UIImage *image4 = [UIImage imageNamed:@"ZSSGoForwardButton"];
+    UIImage *image4 = [UIImage imageNamed:@"ZSSTabGoForwardButton_N"];
     [forwarkButton setImage:image4 forState:UIControlStateNormal];
+    UIImage *image9 = [UIImage imageNamed:@"ZSSTabGoForwardButton_H"];
+    [forwarkButton setImage:image9 forState:UIControlStateHighlighted];
+    [forwarkButton setImage:image9 forState:UIControlStateDisabled];
     [forwarkButton sizeToFit];
+    [forwarkButton addTarget:self action:@selector(goForward) forControlEvents:UIControlEventTouchUpInside];
     ZSSUIButton *menuButton     = [[ZSSUIButton alloc] init];
-    UIImage *image5 = [UIImage imageNamed:@"ZSSTabMenuButton"];
+    UIImage *image5 = [UIImage imageNamed:@"ZSSTabMenuButton_N"];
     [menuButton setImage:image5 forState:UIControlStateNormal];
+    UIImage *image10 = [UIImage imageNamed:@"ZSSTabMenuButton_H"];
+    [menuButton setImage:image10 forState:UIControlStateHighlighted];
+    [menuButton setImage:image10 forState:UIControlStateDisabled];
     [menuButton sizeToFit];
     ZSSUIButton *multiButton    = [[ZSSUIButton alloc] init];
-    UIImage *image6 = [UIImage imageNamed:@"ZSSTabOverviewButton"];
+    UIImage *image6 = [UIImage imageNamed:@"ZSSTabMultiButton_N"];
     [multiButton setImage:image6 forState:UIControlStateNormal];
+    UIImage *image11 = [UIImage imageNamed:@"ZSSTabMultiButton_H"];
+    [multiButton setImage:image11 forState:UIControlStateHighlighted];
+    [multiButton setImage:image11 forState:UIControlStateDisabled];
     [multiButton sizeToFit];
     ZSSUIButton *homeButton     = [[ZSSUIButton alloc] init];
-    UIImage *image7 = [UIImage imageNamed:@"ZSSTabHomeButton"];
+    UIImage *image7 = [UIImage imageNamed:@"ZSSTabHomeButton_N"];
     [homeButton setImage:image7 forState:UIControlStateNormal];
+    UIImage *image12 = [UIImage imageNamed:@"ZSSTabHomeButton_H"];
+    [homeButton setImage:image12 forState:UIControlStateHighlighted];
+    [homeButton setImage:image12 forState:UIControlStateDisabled];
     [homeButton sizeToFit];
     
     [_tabView setButtonItems:@[backButton, forwarkButton, menuButton, multiButton, homeButton]];
@@ -228,6 +245,18 @@ UITextFieldDelegate
  // Pass the selected object to the new view controller.
  }
  */
+
+#pragma mark --- action
+
+- (void)goBack
+{
+    [_webView goBack];
+}
+
+- (void)goForward
+{
+    [_webView goForward];
+}
 
 #pragma mark --- private
 

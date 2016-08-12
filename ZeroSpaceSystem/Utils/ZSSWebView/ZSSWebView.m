@@ -94,6 +94,78 @@ WKUIDelegate
  }
  */
 
+- (BOOL)canGoForward {
+    
+    if([_webView isKindOfClass:[WKWebView class]]) {
+        
+        ZSSWKWebView *webView = _webView;
+        
+        return [webView canGoForward];
+    }
+    else {
+        
+        ZSSUIWebView *webView = _webView;
+        
+        return [webView canGoForward];
+    }
+}
+
+- (BOOL)canGoBack {
+    
+    if([_webView isKindOfClass:[WKWebView class]]) {
+        
+        ZSSWKWebView *webView = _webView;
+        
+        return [webView canGoBack];
+    }
+    else {
+        
+        ZSSUIWebView *webView = _webView;
+        
+        return [webView canGoBack];
+    }
+}
+
+- (void)goForward {
+    
+    if([_webView isKindOfClass:[WKWebView class]]) {
+        
+        ZSSWKWebView *webView = _webView;
+        
+        if ([webView canGoForward]) {
+            [webView goForward];
+        }
+    }
+    else {
+        
+        ZSSUIWebView *webView = _webView;
+        
+        if ([webView canGoForward]) {
+            [webView goForward];
+        }
+    }
+}
+
+- (void)goBack {
+    
+    if([_webView isKindOfClass:[WKWebView class]]) {
+        
+        ZSSWKWebView *webView = _webView;
+        
+        if ([webView canGoBack]) {
+            [webView goBack];
+        }
+    }
+    else {
+        
+        ZSSUIWebView *webView = _webView;
+        
+        if ([webView canGoBack]) {
+            [webView goBack];
+        }
+    }
+}
+
 - (BOOL)isLoading {
     
     if([_webView isKindOfClass:[WKWebView class]]) {

@@ -38,6 +38,12 @@
 - (void)stopLoading;
 - (BOOL)isLoading;
 
+- (BOOL)canGoForward;
+- (BOOL)canGoBack;
+
+- (void)goBack;
+- (void)goForward;
+
 - (void)evaluateJavaScript:(NSString *)javaScriptString completionHandler:(void (^ __nullable)(__nullable id, NSError * __nullable error))completionHandler;
 
 - (void)registerWebViewJavascriptBridgeWithHandler:(NSString *)handlerName handler:(void (^)(id, void (^)(id)))handler;
