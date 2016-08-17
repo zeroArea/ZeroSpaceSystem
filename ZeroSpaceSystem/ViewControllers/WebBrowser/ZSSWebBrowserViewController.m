@@ -14,12 +14,15 @@
 #import <WebKit/WebKit.h>
 
 #import "ZSSUITextField.h"
-#import "ZSSWebView.h"
+#import "ZSSUIWebView.h"
 #import "ZSSUIProgressView.h"
 #import "ZSSTabView.h"
 #import "ZSSUIImageView.h"
 #import "ZSSUIImage.h"
 #import "ZSSUIButton.h"
+
+#import "ZSSCarouselView.h"
+#import "ZSSCommonHelpers.h"
 
 // Log levels: off, error, warn, info, verbose
 static const int ddLogLevel = LOG_LEVEL_INFO;
@@ -27,18 +30,22 @@ static const int ddLogLevel = LOG_LEVEL_INFO;
 @interface ZSSWebBrowserViewController ()
 <
 UIScrollViewDelegate,
-ZSSWebViewDelegate,
-UITextFieldDelegate
+ZSSUIWebViewProgressDelegate,
+UIWebViewDelegate,
+UITextFieldDelegate,
+iCarouselDataSource,
+iCarouselDelegate
 >
-{
-    BOOL dragStart;
-    CGFloat previousYOffset;
-}
+
+@property (assign, nonatomic) NSInteger                 countCarousel;
+
+@property (assign, nonatomic) BOOL                      dragStart;
+@property (assign, nonatomic) CGFloat                   previousYOffset;
 
 @property (strong, nonatomic) NSString                  *addressURLString;
 @property (strong, nonatomic) NSString                  *addressTitleString;
 
-@property (strong, nonatomic) ZSSWebView                *webView;
+@property (strong, nonatomic) ZSSUIWebView                *currentWebView;
 
 @property (strong, nonatomic) ZSSUITextField            *addressTextField;
 
@@ -50,6 +57,8 @@ UITextFieldDelegate
 @property (strong, nonatomic) ZSSUIProgressView         *webViewProgressBar;
 
 @property (strong, nonatomic) ZSSTabView                *tabView;
+
+@property (strong, nonatomic) ZSSCarouselView           *carouselView;
 
 @end
 
@@ -79,19 +88,167 @@ UITextFieldDelegate
     return _reloadButton;
 }
 
+#pragma mark --- Action
+
 - (void)leftOnClicked:(id)sender {
+    
+}
+
+- (void)goBack
+{
+    [_currentWebView goBack];
+}
+
+- (void)goForward
+{
+    [_currentWebView goForward];
+}
+
+- (void)menuOnClicked:(id)sender
+{
+    
+}
+
+- (void)goHome
+{
     
 }
 
 - (void)reloadOnClicked:(id)sender {
     
-    if ([_webView isLoading]) {
+    if ([_currentWebView isLoading]) {
         
-        [_webView stopLoading];
+        [_currentWebView stopLoading];
     }
     else {
         
-        [_webView reload];
+        [_currentWebView reload];
+    }
+}
+
+- (void)multiOnClicked:(id)sender {
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        [self showControl:NO animate:NO];
+        
+        [_currentWebView setFrame:(CGRect){
+            SCREEN_WIDTH / 6.f,
+            (SCREEN_HEIGHT - STATUSBAR_HEIGHT) / 6.f + STATUSBAR_HEIGHT,
+            SCREEN_WIDTH * 2.f / 3.f,
+            (SCREEN_HEIGHT - STATUSBAR_HEIGHT) * 2.f / 3.f
+        }];
+    } completion:^(BOOL finished) {
+        [_currentWebView removeFromSuperview];
+        
+        _currentWebView.userInteractionEnabled = NO;
+        
+        _currentWebView.scrollView.scrollEnabled = NO;
+        
+        [_currentWebView setFrame:(CGRect){
+            0,
+            0,
+            SCREEN_WIDTH * 2.f / 3.f,
+            (SCREEN_HEIGHT - STATUSBAR_HEIGHT) * 2.f / 3.f
+        }];
+        
+        [_carouselView.currentItemView addSubview:_currentWebView];
+        
+        _carouselView.userInteractionEnabled = YES;
+    }];
+}
+
+- (void)noneOnClicked:(id)sender {
+    
+}
+
+- (void)addTabOnClicked:(id)sender {
+    _countCarousel++;
+    
+    [_carouselView insertItemAtIndex:_countCarousel - 1 animated:YES];
+    
+    [_carouselView scrollToItemAtIndex:_countCarousel - 1 animated:YES];
+}
+
+- (void)backTabOnClicked:(id)sender {
+    
+}
+
+#pragma mark --- iCarouselDataSource
+
+- (NSInteger)numberOfItemsInCarousel:(iCarousel *)carousel
+{
+    return _countCarousel;
+}
+
+- (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(UIView *)view
+{
+    if (view == nil)
+    {
+        view = [[UIView alloc] initWithFrame:(CGRect){
+            0.f,
+            0.f,
+            SCREEN_WIDTH * 2.f / 3.f,
+            (SCREEN_HEIGHT - STATUSBAR_HEIGHT) * 2.f / 3.f
+        }];
+    }
+    
+    if (index != 0) {
+        ZSSUIWebView *webView = [[ZSSUIWebView alloc] initWithFrame:(CGRect){
+            0.f,
+            0.f,
+            SCREEN_WIDTH * 2.f / 3.f,
+            (SCREEN_HEIGHT - STATUSBAR_HEIGHT) * 2.f / 3.f
+        }];
+        webView.delegate = self;
+        webView.scrollView.delegate = self;
+        webView.progressDelegate = self;
+        [webView setMultipleTouchEnabled:YES];
+        [webView setAutoresizesSubviews:YES];
+        [webView setScalesPageToFit:YES];
+        [webView.scrollView setAlwaysBounceVertical:YES];
+        [webView.scrollView setAlwaysBounceHorizontal:YES];
+        [view addSubview:webView];
+        
+        webView.userInteractionEnabled = NO;
+        webView.scrollView.scrollEnabled = NO;
+    }
+    
+    return view;
+}
+
+#pragma mark --- iCarouselDelegate
+
+- (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index
+{
+    if (carousel.currentItemIndex == index)
+    {
+        carousel.userInteractionEnabled = NO;
+        
+        ZSSUIWebView *view = (ZSSUIWebView *)[carousel.currentItemView subviews][0];
+        
+        view.userInteractionEnabled = YES;
+        
+        view.scrollView.scrollEnabled = YES;
+        
+        CGRect frame = [view convertRect:view.frame toView:self.view];
+        
+        view.frame = frame;
+        
+        [view removeFromSuperview];
+        
+        [self.contentView addSubview:view];
+        
+        _currentWebView = view;
+        
+        [UIView animateWithDuration:0.5 animations:^{
+            view.frame = (CGRect){
+                0,
+                NAVIGATIONBAR_HEIGHT + STATUSBAR_HEIGHT,
+                SCREEN_WIDTH,
+                SCREEN_HEIGHT - NAVIGATIONBAR_HEIGHT - STATUSBAR_HEIGHT
+            };
+            [self showControl:YES animate:NO];
+        }];
     }
 }
 
@@ -131,13 +288,14 @@ UITextFieldDelegate
     [self navigationViewAddCoverView:_addressTextField];
     
     _leftButton = [[ZSSUIButton alloc] init];
-    UIImage *image2 = [UIImage imageNamed:@"0202-sphere"];
+    UIImage *image2 = [UIImage imageNamed:@"ZSSNaviFavoritesButton_N"];
     [_leftButton setImage:image2 forState:UIControlStateNormal];
+    [_leftButton sizeToFit];
     _leftButton.frame = (CGRect){
-        10.f,
-        0.f,
-        NAVIGATIONBAR_HEIGHT - 20,
-        NAVIGATIONBAR_HEIGHT - 20
+        10,
+        0,
+        _leftButton.frame.size.width,
+        _leftButton.frame.size.height
     };
     [_leftButton addTarget:self
                     action:@selector(leftOnClicked:)
@@ -145,32 +303,75 @@ UITextFieldDelegate
     _addressLeftView = [[ZSSUIView alloc] initWithFrame:(CGRect){
         0.f,
         0.f,
-        NAVIGATIONBAR_HEIGHT - 20 + 10,
-        NAVIGATIONBAR_HEIGHT - 20
+        _leftButton.frame.size.width + 10,
+        _leftButton.frame.size.height
     }];
     [_addressLeftView addSubview:_leftButton];
     _addressTextField.leftView  = _addressLeftView;
     
-    _webView = [[ZSSWebView alloc] initWithFrame:(CGRect){
+    _countCarousel = 1;
+    
+    _carouselView = [[ZSSCarouselView alloc] initWithFrame:(CGRect){
+        0,
+        STATUSBAR_HEIGHT,
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT - STATUSBAR_HEIGHT
+    }];
+    _carouselView.backgroundColor = [UIColor purpleColor];
+    _carouselView.type = iCarouselTypeCoverFlow2;
+    _carouselView.delegate = self;
+    _carouselView.dataSource = self;
+    _carouselView.userInteractionEnabled = NO;
+    [self.contentView addSubview:_carouselView];
+    
+    _currentWebView = [[ZSSUIWebView alloc] initWithFrame:(CGRect){
         0,
         STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT,
         SCREEN_WIDTH,
         SCREEN_HEIGHT - STATUSBAR_HEIGHT - NAVIGATIONBAR_HEIGHT
     }];
-    _webView.delegate = self;
-    if ([_webView.webView isKindOfClass:[WKWebView class]])
-    {
-        WKWebView *webview = _webView.webView;
-        
-        webview.scrollView.delegate = self;
-    }
-    else
-    {
-        UIWebView *webview = _webView.webView;
-        
-        webview.scrollView.delegate = self;
-    }
-    [self.view addSubview:_webView];
+    _currentWebView.delegate = self;
+    _currentWebView.scrollView.delegate = self;
+    _currentWebView.progressDelegate = self;
+    [_currentWebView setMultipleTouchEnabled:YES];
+    [_currentWebView setAutoresizesSubviews:YES];
+    [_currentWebView setScalesPageToFit:YES];
+    [_currentWebView.scrollView setAlwaysBounceVertical:YES];
+    [_currentWebView.scrollView setAlwaysBounceHorizontal:YES];
+    [self.contentView addSubview:_currentWebView];
+    
+    ZSSUIButton *noneButton     = [self createButtonWithNImage:[UIImage imageNamed:@"ZSSNaviBackButton_H"]
+                                                        hImage:[UIImage imageNamed:@"ZSSNaviBackButton_H"]
+                                                        action:@selector(noneOnClicked:)];
+    noneButton.frame = (CGRect){
+        10,
+        SCREEN_HEIGHT - noneButton.frame.size.height - 5,
+        noneButton.frame.size.width,
+        noneButton.frame.size.height
+    };
+    [self.contentView addSubview:noneButton];
+    
+    ZSSUIButton *addTabButton   = [self createButtonWithNImage:[UIImage imageNamed:@"ZSSNaviBackButton_H"]
+                                                        hImage:[UIImage imageNamed:@"ZSSNaviBackButton_H"]
+                                                        action:@selector(addTabOnClicked:)];
+    addTabButton.frame = (CGRect){
+        (SCREEN_WIDTH - noneButton.frame.size.width) / 2,
+        SCREEN_HEIGHT - noneButton.frame.size.height - 5,
+        addTabButton.frame.size.width,
+        addTabButton.frame.size.height
+    };
+    [self.contentView addSubview:addTabButton];
+    
+    ZSSUIButton *backTabButton  = [self createButtonWithNImage:[UIImage imageNamed:@"ZSSNaviBackButton_H"]
+                                                        hImage:[UIImage imageNamed:@"ZSSNaviBackButton_H"]
+                                                        action:@selector(backTabOnClicked:)];
+    backTabButton.frame = (CGRect){
+        SCREEN_WIDTH - backTabButton.frame.size.width - 10,
+        SCREEN_HEIGHT - backTabButton.frame.size.height - 5,
+        backTabButton.frame.size.width,
+        backTabButton.frame.size.height
+    };
+    [self.contentView addSubview:backTabButton];
     
     _webViewProgressBar = [[ZSSUIProgressView alloc] initWithFrame:(CGRect){
         0.f,
@@ -178,7 +379,7 @@ UITextFieldDelegate
         SCREEN_WIDTH,
         2.f
     }];
-    [self.view addSubview:_webViewProgressBar];
+    [self.contentView addSubview:_webViewProgressBar];
     
     _webViewProgressBar.alpha = 0;
     
@@ -188,43 +389,26 @@ UITextFieldDelegate
         SCREEN_WIDTH,
         TABBAR_HEIGHT
     }];
-    ZSSUIButton *backButton     = [[ZSSUIButton alloc] init];
-    UIImage *image3 = [UIImage imageNamed:@"ZSSTabGoBackButton_N"];
-    [backButton setImage:image3 forState:UIControlStateNormal];
-    UIImage *image8 = [UIImage imageNamed:@"ZSSTabGoBackButton_H"];
-    [backButton setImage:image8 forState:UIControlStateHighlighted];
-    [backButton setImage:image8 forState:UIControlStateDisabled];
-    [backButton sizeToFit];
-    [backButton addTarget:self action:@selector(goBack) forControlEvents:UIControlEventTouchUpInside];
-    ZSSUIButton *forwarkButton  = [[ZSSUIButton alloc] init];
-    UIImage *image4 = [UIImage imageNamed:@"ZSSTabGoForwardButton_N"];
-    [forwarkButton setImage:image4 forState:UIControlStateNormal];
-    UIImage *image9 = [UIImage imageNamed:@"ZSSTabGoForwardButton_H"];
-    [forwarkButton setImage:image9 forState:UIControlStateHighlighted];
-    [forwarkButton setImage:image9 forState:UIControlStateDisabled];
-    [forwarkButton sizeToFit];
-    [forwarkButton addTarget:self action:@selector(goForward) forControlEvents:UIControlEventTouchUpInside];
-    ZSSUIButton *menuButton     = [[ZSSUIButton alloc] init];
-    UIImage *image5 = [UIImage imageNamed:@"ZSSTabMenuButton_N"];
-    [menuButton setImage:image5 forState:UIControlStateNormal];
-    UIImage *image10 = [UIImage imageNamed:@"ZSSTabMenuButton_H"];
-    [menuButton setImage:image10 forState:UIControlStateHighlighted];
-    [menuButton setImage:image10 forState:UIControlStateDisabled];
-    [menuButton sizeToFit];
-    ZSSUIButton *multiButton    = [[ZSSUIButton alloc] init];
-    UIImage *image6 = [UIImage imageNamed:@"ZSSTabMultiButton_N"];
-    [multiButton setImage:image6 forState:UIControlStateNormal];
-    UIImage *image11 = [UIImage imageNamed:@"ZSSTabMultiButton_H"];
-    [multiButton setImage:image11 forState:UIControlStateHighlighted];
-    [multiButton setImage:image11 forState:UIControlStateDisabled];
-    [multiButton sizeToFit];
-    ZSSUIButton *homeButton     = [[ZSSUIButton alloc] init];
-    UIImage *image7 = [UIImage imageNamed:@"ZSSTabHomeButton_N"];
-    [homeButton setImage:image7 forState:UIControlStateNormal];
-    UIImage *image12 = [UIImage imageNamed:@"ZSSTabHomeButton_H"];
-    [homeButton setImage:image12 forState:UIControlStateHighlighted];
-    [homeButton setImage:image12 forState:UIControlStateDisabled];
-    [homeButton sizeToFit];
+    
+    ZSSUIButton *backButton     = [self createButtonWithNImage:[UIImage imageNamed:@"ZSSTabGoBackButton_N"]
+                                                        hImage:[UIImage imageNamed:@"ZSSTabGoBackButton_H"]
+                                                        action:@selector(goBack)];
+    
+    ZSSUIButton *forwarkButton  = [self createButtonWithNImage:[UIImage imageNamed:@"ZSSTabGoForwardButton_N"]
+                                                        hImage:[UIImage imageNamed:@"ZSSTabGoForwardButton_H"]
+                                                        action:@selector(goForward)];
+    
+    ZSSUIButton *menuButton     = [self createButtonWithNImage:[UIImage imageNamed:@"ZSSTabMenuButton_N"]
+                                                        hImage:[UIImage imageNamed:@"ZSSTabMenuButton_H"]
+                                                        action:@selector(menuOnClicked:)];
+    
+    ZSSUIButton *multiButton    = [self createButtonWithNImage:[UIImage imageNamed:@"ZSSTabMultiButton_N"]
+                                                        hImage:[UIImage imageNamed:@"ZSSTabMultiButton_H"]
+                                                        action:@selector(multiOnClicked:)];
+    
+    ZSSUIButton *homeButton     = [self createButtonWithNImage:[UIImage imageNamed:@"ZSSTabHomeButton_N"]
+                                                        hImage:[UIImage imageNamed:@"ZSSTabHomeButton_H"]
+                                                        action:@selector(goHome)];
     
     [_tabView setButtonItems:@[backButton, forwarkButton, menuButton, multiButton, homeButton]];
     [self.view addSubview:_tabView];
@@ -236,6 +420,17 @@ UITextFieldDelegate
     // Dispose of any resources that can be recreated.
 }
 
+- (ZSSUIButton *)createButtonWithNImage:(UIImage *)nimage hImage:(UIImage *)himage action:(SEL)action {
+    ZSSUIButton *button     = [[ZSSUIButton alloc] init];
+    [button setImage:nimage forState:UIControlStateNormal];
+    [button setImage:himage forState:UIControlStateHighlighted];
+    [button setImage:himage forState:UIControlStateDisabled];
+    [button sizeToFit];
+    [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
+    
+    return button;
+}
+
 /*
  #pragma mark - Navigation
  
@@ -245,18 +440,6 @@ UITextFieldDelegate
  // Pass the selected object to the new view controller.
  }
  */
-
-#pragma mark --- action
-
-- (void)goBack
-{
-    [_webView goBack];
-}
-
-- (void)goForward
-{
-    [_webView goForward];
-}
 
 #pragma mark --- private
 
@@ -288,7 +471,7 @@ UITextFieldDelegate
         NSURL           *url        = [[NSURL alloc] initWithString:_addressTextField.text];
         NSURLRequest    *urlRequest = [NSURLRequest requestWithURL:url];
         
-        [_webView loadRequest:urlRequest];
+        [_currentWebView loadRequest:urlRequest];
     }
     else
     {
@@ -301,7 +484,7 @@ UITextFieldDelegate
             NSURL           *url        = [[NSURL alloc] initWithString:urlString];
             NSURLRequest    *urlRequest = [NSURLRequest requestWithURL:url];
             
-            [_webView loadRequest:urlRequest];
+            [_currentWebView loadRequest:urlRequest];
         }
         else
         {
@@ -314,45 +497,25 @@ UITextFieldDelegate
             NSURL           *url        = [[NSURL alloc] initWithString:urlString];
             NSURLRequest    *urlRequest = [NSURLRequest requestWithURL:url];
             
-            [_webView loadRequest:urlRequest];
+            [_currentWebView loadRequest:urlRequest];
         }
     }
 }
 
 - (void)dealloc
 {
-    [_webView removeObserver:self forKeyPath:@"estimatedProgress"];
+    [_currentWebView removeObserver:self forKeyPath:@"estimatedProgress"];
     
-    [_webView setDelegate:nil];
+    [_currentWebView setDelegate:nil];
 }
 
-#pragma mark - WKUIDelegate
+#pragma mark - UIWebViewDelegate
 
-- (void)zsswebView:(ZSSWebView *)webview progress:(CGFloat)progress
-{
-    DDLogInfo(@"%@:%@", THIS_FILE, THIS_METHOD);
-    
-    if (_webViewProgressBar.alpha == 0.f && progress > 0)
-    {
-        _webViewProgressBar.progress = 0.f;
-        
-        [UIView animateWithDuration:0.2 animations:^{
-            _webViewProgressBar.alpha = 1.f;
-        }];
-    }
-    else if (_webViewProgressBar.alpha == 1.f && progress == 1.f)
-    {
-        [UIView animateWithDuration:0.2 animations:^{
-            _webViewProgressBar.alpha = 0.f;
-        } completion:^(BOOL finished) {
-            _webViewProgressBar.progress = 0.f;
-        }];
-    }
-    [_webViewProgressBar setProgress:progress animated:YES];
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    return YES;
 }
 
-- (void)zsswebView:(ZSSWebView *)webview shouldStartLoadWithURL:(NSURL *)URL
-{
+- (void)webViewDidStartLoad:(UIWebView *)webView {
     DDLogInfo(@"%@:%@", THIS_FILE, THIS_METHOD);
     
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
@@ -361,38 +524,49 @@ UITextFieldDelegate
     [self.reloadButton setImage:image forState:UIControlStateNormal];
 }
 
-- (void)zsswebViewDidStartLoad:(ZSSWebView *)webview
-{
+- (void)webView:(ZSSUIWebView*)webView didReceiveResourceNumber:(int)resourceNumber totalResources:(int)totalResources {
     DDLogInfo(@"%@:%@", THIS_FILE, THIS_METHOD);
     
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    if (_webViewProgressBar.alpha == 0.f && resourceNumber > 0 && totalResources > resourceNumber)
+    {
+        _webViewProgressBar.progress = 0.f;
+        
+        [UIView animateWithDuration:0.2 animations:^{
+            _webViewProgressBar.alpha = 1.f;
+        }];
+    }
+    else if (_webViewProgressBar.alpha == 1.f && resourceNumber == totalResources)
+    {
+        [UIView animateWithDuration:0.2 animations:^{
+            _webViewProgressBar.alpha = 0.f;
+        } completion:^(BOOL finished) {
+            _webViewProgressBar.progress = 0.f;
+        }];
+    }
+    [_webViewProgressBar setProgress:(resourceNumber * 1.f / totalResources * 1.f) animated:YES];
 }
 
-- (void)zsswebView:(ZSSWebView *)webview didFinishLoadingURL:(NSURL *)URL {
-    
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     DDLogInfo(@"%@:%@", THIS_FILE, THIS_METHOD);
     
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-    
-    [_webView evaluateJavaScript:@"document.title" completionHandler:^(id _Nullable data, NSError * _Nullable error) {
-        NSString *string = data;
-        _addressTitleString = string;
-        _addressTextField.text = string;
-    }];
-    
-    [_webView evaluateJavaScript:@"document.getElementsByClassName('adpic')[0].style.display = 'none'" completionHandler:^(id _Nullable data, NSError * _Nullable error) {
-        
-    }];
     
     UIImage *image = [UIImage imageNamed:@"ZSSNaviRefreshButton"];
     [self.reloadButton setImage:image forState:UIControlStateNormal];
 }
 
-- (void)zsswebView:(ZSSWebView *)webview didFailToLoadURL:(NSURL *)URL error:(NSError *)error {
-    
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
     DDLogInfo(@"%@:%@", THIS_FILE, THIS_METHOD);
     
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    
+    _addressTitleString = [_currentWebView stringByEvaluatingJavaScriptFromString:@"document.title"];
+    _addressTextField.text = _addressTitleString;
+    
+    [_currentWebView stringByEvaluatingJavaScriptFromString:@"document.getElementsByClassName('adpic')[0].style.display = 'none'"];
+    
+    UIImage *image = [UIImage imageNamed:@"ZSSNaviRefreshButton"];
+    [self.reloadButton setImage:image forState:UIControlStateNormal];
 }
 
 #pragma mark -- UITextFieldDelegate
@@ -441,91 +615,162 @@ UITextFieldDelegate
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     
-    dragStart = YES;
+    _dragStart = YES;
     
-    previousYOffset = scrollView.contentOffset.y;
+    _previousYOffset = scrollView.contentOffset.y;
     
-    DDLogInfo(@"previousYOffset --- %lf", previousYOffset);
+    DDLogInfo(@"previousYOffset --- %lf", _previousYOffset);
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     
-    if (!dragStart) {
+    if (!_dragStart) {
         
         return;
     }
     
     DDLogInfo(@"scrollView.contentOffset.y --- %lf", scrollView.contentOffset.y);
     
-    CGFloat delta = scrollView.contentOffset.y - previousYOffset;
+    CGFloat delta = scrollView.contentOffset.y - _previousYOffset;
     
     DDLogInfo(@"delta --- %lf", delta);
     
     if (delta > 20) {
         
-        [self setNavigationViewFrame:(CGRect){
-            0.f,
-            0.f,
-            SCREEN_WIDTH,
-            STATUSBAR_HEIGHT
-        }];
-        
-        [_webView setFrame:(CGRect){
-            0.f,
-            STATUSBAR_HEIGHT,
-            SCREEN_WIDTH,
-            SCREEN_HEIGHT - STATUSBAR_HEIGHT
-        }];
-        
-        _webViewProgressBar.frame = (CGRect){
-            0.f,
-            STATUSBAR_HEIGHT - 2.f,
-            SCREEN_WIDTH,
-            2.f
-        };
-        
-        _tabView.frame = (CGRect){
-            0.f,
-            SCREEN_HEIGHT,
-            SCREEN_WIDTH,
-            TABBAR_HEIGHT
-        };
+        [self showControl:NO animate:YES];
     }
     else if (delta < -20) {
         
-        [self setNavigationViewFrame:(CGRect){
-            0.f,
-            0.f,
-            SCREEN_WIDTH,
-            STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT
-        }];
-        
-        [_webView setFrame:(CGRect){
-            0.f,
-            STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT,
-            SCREEN_WIDTH,
-            SCREEN_HEIGHT - STATUSBAR_HEIGHT - NAVIGATIONBAR_HEIGHT
-        }];
-        
-        _webViewProgressBar.frame = (CGRect){
-            0.f,
-            NAVIGATIONBAR_HEIGHT + STATUSBAR_HEIGHT - 2.f,
-            SCREEN_WIDTH,
-            2.f
-        };
-        
-        _tabView.frame = (CGRect){
-            0.f,
-            SCREEN_HEIGHT - TABBAR_HEIGHT,
-            SCREEN_WIDTH,
-            TABBAR_HEIGHT
-        };
+        [self showControl:YES animate:YES];
     }
 }
 
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
     
-    dragStart = NO;
+    _dragStart = NO;
+}
+
+- (void)showControl:(BOOL)show animate:(BOOL)animate
+{
+    if (animate) {
+        [UIView animateWithDuration:0.5 animations:^{
+            if (show) {
+                [self setNavigationViewFrame:(CGRect){
+                    0.f,
+                    0.f,
+                    SCREEN_WIDTH,
+                    STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT
+                }];
+                
+                [_currentWebView setFrame:(CGRect){
+                    0.f,
+                    STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT,
+                    SCREEN_WIDTH,
+                    SCREEN_HEIGHT - STATUSBAR_HEIGHT - NAVIGATIONBAR_HEIGHT
+                }];
+                
+                _webViewProgressBar.frame = (CGRect){
+                    0.f,
+                    NAVIGATIONBAR_HEIGHT + STATUSBAR_HEIGHT - 2.f,
+                    SCREEN_WIDTH,
+                    2.f
+                };
+                
+                _tabView.frame = (CGRect){
+                    0.f,
+                    SCREEN_HEIGHT - TABBAR_HEIGHT,
+                    SCREEN_WIDTH,
+                    TABBAR_HEIGHT
+                };
+            } else {
+                [self setNavigationViewFrame:(CGRect){
+                    0.f,
+                    0.f,
+                    SCREEN_WIDTH,
+                    STATUSBAR_HEIGHT
+                }];
+                
+                [_currentWebView setFrame:(CGRect){
+                    0.f,
+                    STATUSBAR_HEIGHT,
+                    SCREEN_WIDTH,
+                    SCREEN_HEIGHT - STATUSBAR_HEIGHT
+                }];
+                
+                _webViewProgressBar.frame = (CGRect){
+                    0.f,
+                    STATUSBAR_HEIGHT - 2.f,
+                    SCREEN_WIDTH,
+                    2.f
+                };
+                
+                _tabView.frame = (CGRect){
+                    0.f,
+                    SCREEN_HEIGHT,
+                    SCREEN_WIDTH,
+                    TABBAR_HEIGHT
+                };
+            }
+        }];
+    } else {
+        if (show) {
+            [self setNavigationViewFrame:(CGRect){
+                0.f,
+                0.f,
+                SCREEN_WIDTH,
+                STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT
+            }];
+            
+            [_currentWebView setFrame:(CGRect){
+                0.f,
+                STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT,
+                SCREEN_WIDTH,
+                SCREEN_HEIGHT - STATUSBAR_HEIGHT - NAVIGATIONBAR_HEIGHT
+            }];
+            
+            _webViewProgressBar.frame = (CGRect){
+                0.f,
+                NAVIGATIONBAR_HEIGHT + STATUSBAR_HEIGHT - 2.f,
+                SCREEN_WIDTH,
+                2.f
+            };
+            
+            _tabView.frame = (CGRect){
+                0.f,
+                SCREEN_HEIGHT - TABBAR_HEIGHT,
+                SCREEN_WIDTH,
+                TABBAR_HEIGHT
+            };
+        } else {
+            [self setNavigationViewFrame:(CGRect){
+                0.f,
+                0.f,
+                SCREEN_WIDTH,
+                STATUSBAR_HEIGHT
+            }];
+            
+            [_currentWebView setFrame:(CGRect){
+                0.f,
+                STATUSBAR_HEIGHT,
+                SCREEN_WIDTH,
+                SCREEN_HEIGHT - STATUSBAR_HEIGHT
+            }];
+            
+            _webViewProgressBar.frame = (CGRect){
+                0.f,
+                STATUSBAR_HEIGHT - 2.f,
+                SCREEN_WIDTH,
+                2.f
+            };
+            
+            _tabView.frame = (CGRect){
+                0.f,
+                SCREEN_HEIGHT,
+                SCREEN_WIDTH,
+                TABBAR_HEIGHT
+            };
+        }
+    }
 }
 
 @end

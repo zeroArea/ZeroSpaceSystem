@@ -39,6 +39,14 @@
     
     [self.navigationController setNavigationBarHidden:YES];
     
+    _contentView = [[ZSSUIView alloc] initWithFrame:(CGRect){
+        0,
+        0,
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT
+    }];
+    [self.view addSubview:_contentView];
+    
     _navigationView = [[ZSSNavigationView alloc] initWithFrame:(CGRect){
         0,
         0,

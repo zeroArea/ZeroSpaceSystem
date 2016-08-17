@@ -7,6 +7,7 @@
 //
 
 #import "ZSSUIView.h"
+#import "ZSSUIScrollView.h"
 #import "ZSSUILabel.h"
 #import "ZSSUIButton.h"
 #import "ZSSUIColor.h"
@@ -14,7 +15,7 @@
 #import "ZSSNSString.h"
 #import "ZSSUIViewController.h"
 
-@interface ZSSNavigationView : ZSSUIView
+@interface ZSSNavigationView : ZSSUIScrollView
 
 /**
  *  设置左按钮

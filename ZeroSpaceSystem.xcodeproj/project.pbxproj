@@ -36,6 +36,10 @@
 		B5075CBA1D3CC88D007DA068 /* ZSSNSObject.m in Sources */ = {isa = PBXBuildFile; fileRef = B5075CB91D3CC88D007DA068 /* ZSSNSObject.m */; };
 		B50A9E891D5B0B4800ACAB84 /* ZSSTabView.m in Sources */ = {isa = PBXBuildFile; fileRef = B50A9E881D5B0B4800ACAB84 /* ZSSTabView.m */; };
 		B50A9E8C1D5B192800ACAB84 /* UIImage+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = B50A9E8B1D5B192800ACAB84 /* UIImage+Resize.m */; };
+		B54543201D6413D900FC2D0C /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = B545431F1D6413D900FC2D0C /* iCarousel.m */; };
+		B54543241D64145000FC2D0C /* ZSSCarouselView.m in Sources */ = {isa = PBXBuildFile; fileRef = B54543231D64145000FC2D0C /* ZSSCarouselView.m */; };
+		B54543271D6430F200FC2D0C /* ZSSCommonHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = B54543261D6430F200FC2D0C /* ZSSCommonHelpers.m */; };
+		B545432B1D643E3100FC2D0C /* ZSSUIScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = B545432A1D643E3100FC2D0C /* ZSSUIScrollView.m */; };
 		B57B2EE71D3F763F000EB057 /* ZSSIPAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = B57B2EE61D3F763F000EB057 /* ZSSIPAddress.m */; };
 		B58B90891D4B2E76003E12D4 /* ZSSWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = B58B90881D4B2E76003E12D4 /* ZSSWebView.m */; };
 		B59F6FBB1D420E370050E64A /* ZSSHTTPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = B59F6FBA1D420E370050E64A /* ZSSHTTPConnection.m */; };
@@ -135,6 +139,14 @@
 		B50A9E881D5B0B4800ACAB84 /* ZSSTabView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZSSTabView.m; sourceTree = "<group>"; };
 		B50A9E8A1D5B192800ACAB84 /* UIImage+Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Resize.h"; sourceTree = "<group>"; };
 		B50A9E8B1D5B192800ACAB84 /* UIImage+Resize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Resize.m"; sourceTree = "<group>"; };
+		B545431E1D6413D900FC2D0C /* iCarousel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iCarousel.h; sourceTree = "<group>"; };
+		B545431F1D6413D900FC2D0C /* iCarousel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCarousel.m; sourceTree = "<group>"; };
+		B54543221D64145000FC2D0C /* ZSSCarouselView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZSSCarouselView.h; sourceTree = "<group>"; };
+		B54543231D64145000FC2D0C /* ZSSCarouselView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZSSCarouselView.m; sourceTree = "<group>"; };
+		B54543251D6430F200FC2D0C /* ZSSCommonHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZSSCommonHelpers.h; sourceTree = "<group>"; };
+		B54543261D6430F200FC2D0C /* ZSSCommonHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZSSCommonHelpers.m; sourceTree = "<group>"; };
+		B54543291D643E3100FC2D0C /* ZSSUIScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZSSUIScrollView.h; sourceTree = "<group>"; };
+		B545432A1D643E3100FC2D0C /* ZSSUIScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZSSUIScrollView.m; sourceTree = "<group>"; };
 		B57B2EE51D3F763F000EB057 /* ZSSIPAddress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZSSIPAddress.h; sourceTree = "<group>"; };
 		B57B2EE61D3F763F000EB057 /* ZSSIPAddress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZSSIPAddress.m; sourceTree = "<group>"; };
 		B58B90871D4B2E76003E12D4 /* ZSSWebView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZSSWebView.h; sourceTree = "<group>"; };
@@ -380,6 +392,8 @@
 		B5075C741D3C7865007DA068 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				B54543251D6430F200FC2D0C /* ZSSCommonHelpers.h */,
+				B54543261D6430F200FC2D0C /* ZSSCommonHelpers.m */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -420,6 +434,8 @@
 		B5075C791D3C7865007DA068 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				B54543281D643E1A00FC2D0C /* ZSSUIScrollView */,
+				B54543211D64143F00FC2D0C /* ZSSCarouselView */,
 				B5062E341D5486F00056B482 /* ZSSUIImage */,
 				B5062E331D5486E10056B482 /* ZSSNSArray */,
 				B5062E321D5486C50056B482 /* ZSSUIImageView */,
@@ -447,6 +463,7 @@
 		B5075C7A1D3C7865007DA068 /* Vendors */ = {
 			isa = PBXGroup;
 			children = (
+				B545431D1D6413D900FC2D0C /* iCarousel */,
 			);
 			path = Vendors;
 			sourceTree = "<group>";
@@ -577,6 +594,33 @@
 				B5075CB61D3CC86E007DA068 /* ZSSUITableViewCell.m */,
 			);
 			path = ZSSUITableViewCell;
+			sourceTree = "<group>";
+		};
+		B545431D1D6413D900FC2D0C /* iCarousel */ = {
+			isa = PBXGroup;
+			children = (
+				B545431E1D6413D900FC2D0C /* iCarousel.h */,
+				B545431F1D6413D900FC2D0C /* iCarousel.m */,
+			);
+			path = iCarousel;
+			sourceTree = "<group>";
+		};
+		B54543211D64143F00FC2D0C /* ZSSCarouselView */ = {
+			isa = PBXGroup;
+			children = (
+				B54543221D64145000FC2D0C /* ZSSCarouselView.h */,
+				B54543231D64145000FC2D0C /* ZSSCarouselView.m */,
+			);
+			path = ZSSCarouselView;
+			sourceTree = "<group>";
+		};
+		B54543281D643E1A00FC2D0C /* ZSSUIScrollView */ = {
+			isa = PBXGroup;
+			children = (
+				B54543291D643E3100FC2D0C /* ZSSUIScrollView.h */,
+				B545432A1D643E3100FC2D0C /* ZSSUIScrollView.m */,
+			);
+			path = ZSSUIScrollView;
 			sourceTree = "<group>";
 		};
 		B58B90861D4B2E5E003E12D4 /* ZSSWebView */ = {
@@ -832,6 +876,7 @@
 				B5075C7C1D3C7865007DA068 /* AppDelegate.m in Sources */,
 				B5062E3A1D5487240056B482 /* ZSSUIImageView.m in Sources */,
 				B5075C921D3C7EAD007DA068 /* ZSSUIViewController.m in Sources */,
+				B545432B1D643E3100FC2D0C /* ZSSUIScrollView.m in Sources */,
 				B5F8CC611D49DC8F0009D3DE /* ZSSUIProgressView.m in Sources */,
 				B59F6FBB1D420E370050E64A /* ZSSHTTPConnection.m in Sources */,
 				B5FD87A31D3DCA5600C13CD8 /* ZSSHTTPServer.m in Sources */,
@@ -844,8 +889,11 @@
 				B5062E371D5487100056B482 /* ZSSUISearchBar.m in Sources */,
 				B57B2EE71D3F763F000EB057 /* ZSSIPAddress.m in Sources */,
 				B50023411D406AF800DAC411 /* ZSSUIWebView.m in Sources */,
+				B54543271D6430F200FC2D0C /* ZSSCommonHelpers.m in Sources */,
+				B54543201D6413D900FC2D0C /* iCarousel.m in Sources */,
 				B5075CBA1D3CC88D007DA068 /* ZSSNSObject.m in Sources */,
 				B58B90891D4B2E76003E12D4 /* ZSSWebView.m in Sources */,
+				B54543241D64145000FC2D0C /* ZSSCarouselView.m in Sources */,
 				B5062E2D1D547BE20056B482 /* ZSSNSString.m in Sources */,
 				B5F8CC131D49BB7B0009D3DE /* ZSSUITableView.m in Sources */,
 				B5075C881D3C7BDA007DA068 /* ZSSAppManagerController.m in Sources */,

@@ -10,6 +10,8 @@
 
 @interface ZSSUIViewController : UIViewController
 
+@property (strong, nonatomic) UIView *contentView;
+
 /**
  *  最上层显示导航条
  */

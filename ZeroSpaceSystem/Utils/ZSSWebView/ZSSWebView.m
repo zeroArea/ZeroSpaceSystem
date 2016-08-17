@@ -79,6 +79,7 @@ WKUIDelegate
             [webView setAutoresizesSubviews:YES];
             [webView setScalesPageToFit:YES];
             [webView.scrollView setAlwaysBounceVertical:YES];
+            [webView.scrollView setAlwaysBounceHorizontal:YES];
             
             [self addSubview:webView];
         }

@@ -121,8 +121,6 @@
     {
         [self hideOriginalBarItem:YES];
         
-        [view removeFromSuperview];
-        
         view.alpha = 0.4f;
         [self addSubview:view];
         
